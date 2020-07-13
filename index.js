@@ -21,8 +21,13 @@ function checkRequired(opts, queryObject, updatedObject) {
   if (queryObject && !queryObject.options && !updatedObject) {
     return;
   }
-  const { __user: user, __reason: reason } =
-    (queryObject && queryObject.options) || updatedObject || httpContext.get('user');
+  let { __user: user, __reason: reason } =
+    (queryObject && queryObject.options) || updatedObject;
+    
+  if (!user) {
+    user = httpContext.get('user');
+  }
+
   if (
     opts.required &&
     ((opts.required.includes("user") && !user) ||
@@ -40,8 +45,12 @@ function saveDiffObject(
   queryObject,
   method
 ) {
-  const { __user: user, __reason: reason, __session: session } =
-    (queryObject && queryObject.options) || currentObject || httpContext.get('user');
+  let { __user: user, __reason: reason, __session: session } =
+    (queryObject && queryObject.options) || currentObject;
+
+    if (!user) {
+        user = httpContext.get('user');
+    }
 
   let diff = diffPatcher.diff(
     JSON.parse(JSON.stringify(original)),
