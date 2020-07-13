@@ -1,4 +1,4 @@
-mongoose-audit-trail
+mongoose-audit-track
 
 =============
 
@@ -15,7 +15,7 @@ Stores and Manages all the differences and versions, any Mongo collection goes t
 ### npm
 
 ```sh
-npm install mongoose-audit-trail
+npm install mongoose-audit-track
 ```
 
 ## Operation
@@ -47,7 +47,7 @@ Use as you would any Mongoose plugin:
 
 ```js
 var mongoose = require('mongoose'),
-    diffHistory = require('mongoose-audit-trail'),
+    diffHistory = require('mongoose-audit-track'),
     schema = new mongoose.Schema({ ... });
     schema.plugin(diffHistory.plugin);
 ```
@@ -57,7 +57,7 @@ keys from history. Follows dot syntax for deeply nested values.
 
 ```js
 const mongoose = require("mongoose");
-const diffHistory = require("mongoose-audit-trail");
+const diffHistory = require("mongoose-audit-track");
 
 const schema = new mongoose.Schema({
   someField: String,
@@ -77,7 +77,7 @@ schema.plugin(diffHistory.plugin, { omit: ["ignoredField", "some.deepField"] });
 You can get all the histories created for an object using following method:
 
 ```js
-const diffHistory = require("mongoose-audit-trail");
+const diffHistory = require("mongoose-audit-track");
 const expandableFields = ["abc", "def"];
 
 diffHistory.getHistories("modelName", ObjectId, expandableFields, function(
@@ -95,7 +95,7 @@ diffHistory
 If you just want the raw histories return with json diff patches:
 
 ```js
-const diffHistory = require("mongoose-audit-trail");
+const diffHistory = require("mongoose-audit-track");
 
 diffHistory.getDiffs("modelName", ObjectId, function(err, histories) {});
 
@@ -115,7 +115,7 @@ diffHistory
 You can get an older version of the object using following method:
 
 ```js
-const diffHistory = require("mongoose-audit-trail");
+const diffHistory = require("mongoose-audit-track");
 
 diffHistory.getVersion(mongooseModel, ObjectId, version, function(
   err,
@@ -132,7 +132,7 @@ diffHistory
 You can also use Mongoose query options with getVersion like so:
 
 ```js
-const diffHistory = require("mongoose-audit-trail");
+const diffHistory = require("mongoose-audit-track");
 
 diffHistory.getVersion(
   mongooseModel,

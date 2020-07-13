@@ -10,7 +10,7 @@ const diffPatcher = require("jsondiffpatch").create({ objectHash });
 
 const History = require("./auditModel").model;
 
-const isValidCb = cb => {
+const isValidCb = (cb) => {
   return cb && typeof cb === "function";
 };
 
@@ -21,7 +21,7 @@ function checkRequired(opts, queryObject, updatedObject) {
     return;
   }
   const { __user: user, __reason: reason } =
-    (queryObject && queryObject.options) || updatedObject;
+    (queryObject && queryObject.options) || updatedObject || opts;
   if (
     opts.required &&
     ((opts.required.includes("user") && !user) ||
@@ -40,7 +40,7 @@ function saveDiffObject(
   method
 ) {
   const { __user: user, __reason: reason, __session: session } =
-    (queryObject && queryObject.options) || currentObject;
+    (queryObject && queryObject.options) || currentObject || opts;
 
   let diff = diffPatcher.diff(
     JSON.parse(JSON.stringify(original)),
@@ -65,7 +65,7 @@ function saveDiffObject(
 
   return History.findOne({ collectionId, collectionName })
     .sort("-version")
-    .then(lastHistory => {
+    .then((lastHistory) => {
       const history = new History({
         collectionId,
         collectionName,
@@ -73,7 +73,7 @@ function saveDiffObject(
         diff,
         user,
         reason,
-        version: lastHistory ? lastHistory.version + 1 : 0
+        version: lastHistory ? lastHistory.version + 1 : 0,
       });
       if (session) {
         return history.save({ session });
@@ -87,7 +87,7 @@ const saveDiffHistory = (queryObject, currentObject, opts, method) => {
   const update = JSON.parse(JSON.stringify(queryObject._update));
   /* eslint-disable security/detect-object-injection */
   const updateParams = Object.assign(
-    ...Object.keys(update).map(function(key) {
+    ...Object.keys(update).map(function (key) {
       if (typeof update[key] === "object") {
         return update[key];
       }
@@ -115,7 +115,7 @@ const saveDiffs = (queryObject, opts, method) =>
     .find(queryObject._conditions)
     .lean(false)
     .cursor()
-    .eachAsync(result => saveDiffHistory(queryObject, result, opts, method));
+    .eachAsync((result) => saveDiffHistory(queryObject, result, opts, method));
 
 const getVersion = (model, id, version, queryOpts, cb) => {
   if (typeof queryOpts === "function") {
@@ -125,20 +125,20 @@ const getVersion = (model, id, version, queryOpts, cb) => {
 
   return model
     .findById(id, null, queryOpts)
-    .then(latest => {
+    .then((latest) => {
       latest = latest || {};
       return History.find(
         {
           collectionName: model.modelName,
           collectionId: id,
-          version: { $gte: parseInt(version, 10) }
+          version: { $gte: parseInt(version, 10) },
         },
         { diff: 1, version: 1 },
         { sort: "-version" }
       )
         .lean()
         .cursor()
-        .eachAsync(history => {
+        .eachAsync((history) => {
           diffPatcher.unpatch(latest, history.diff);
         })
         .then(() => {
@@ -146,7 +146,7 @@ const getVersion = (model, id, version, queryOpts, cb) => {
           return latest;
         });
     })
-    .catch(err => {
+    .catch((err) => {
       if (isValidCb(cb)) return cb(err, null);
       throw err;
     });
@@ -164,11 +164,11 @@ const getDiffs = (modelName, id, opts, cb) => {
     opts
   )
     .lean()
-    .then(histories => {
+    .then((histories) => {
       if (isValidCb(cb)) return cb(null, histories);
       return histories;
     })
-    .catch(err => {
+    .catch((err) => {
       if (isValidCb(cb)) return cb(err, null);
       throw err;
     });
@@ -186,7 +186,7 @@ const getHistories = (modelName, id, expandableFields, cb) => {
   return History.find({ collectionName: modelName, collectionId: id })
     .lean()
     .cursor()
-    .eachAsync(history => {
+    .eachAsync((history) => {
       const changedValues = [];
       const changedFields = [];
       for (const key in history.diff) {
@@ -207,14 +207,14 @@ const getHistories = (modelName, id, expandableFields, cb) => {
         changedAt: history.createdAt,
         updatedAt: history.updatedAt,
         reason: history.reason,
-        comment: comment
+        comment: comment,
       });
     })
     .then(() => {
       if (isValidCb(cb)) return cb(null, histories);
       return histories;
     })
-    .catch(err => {
+    .catch((err) => {
       if (isValidCb(cb)) return cb(err, null);
       throw err;
     });
@@ -230,11 +230,11 @@ const plugin = function lastModifiedPlugin(schema, opts = {}) {
   if (opts.uri) {
     const mongoVersion = parseInt(mongoose.version);
     if (mongoVersion < 5) {
-      mongoose.connect(opts.uri, { useMongoClient: true }).catch(e => {
+      mongoose.connect(opts.uri, { useMongoClient: true }).catch((e) => {
         console.error("mongoose-diff-history connection error:", e);
       });
     } else {
-      mongoose.connect(opts.uri, { useNewUrlParser: true }).catch(e => {
+      mongoose.connect(opts.uri, { useNewUrlParser: true }).catch((e) => {
         console.error("mongoose-diff-history connection error:", e);
       });
     }
@@ -249,12 +249,12 @@ const plugin = function lastModifiedPlugin(schema, opts = {}) {
     }
   }
 
-  schema.pre("save", function(next) {
+  schema.pre("save", function (next) {
     var method;
     this.isNew ? (method = "create") : (method = "update");
     this.constructor
       .findOne({ _id: this._id })
-      .then(original => {
+      .then((original) => {
         if (checkRequired(opts, {}, this)) {
           return;
         }
@@ -271,7 +271,7 @@ const plugin = function lastModifiedPlugin(schema, opts = {}) {
       .catch(next);
   });
 
-  schema.pre("findOneAndUpdate", function(next) {
+  schema.pre("findOneAndUpdate", function (next) {
     if (checkRequired(opts, this)) {
       return next();
     }
@@ -280,7 +280,7 @@ const plugin = function lastModifiedPlugin(schema, opts = {}) {
       .catch(next);
   });
 
-  schema.pre("update", function(next) {
+  schema.pre("update", function (next) {
     if (checkRequired(opts, this)) {
       return next();
     }
@@ -289,7 +289,7 @@ const plugin = function lastModifiedPlugin(schema, opts = {}) {
       .catch(next);
   });
 
-  schema.pre("updateOne", function(next) {
+  schema.pre("updateOne", function (next) {
     if (checkRequired(opts, this)) {
       return next();
     }
@@ -298,7 +298,7 @@ const plugin = function lastModifiedPlugin(schema, opts = {}) {
       .catch(next);
   });
 
-  schema.pre("remove", function(next) {
+  schema.pre("remove", function (next) {
     if (checkRequired(opts, this)) {
       return next();
     }
@@ -312,5 +312,5 @@ module.exports = {
   plugin,
   getVersion,
   getDiffs,
-  getHistories
+  getHistories,
 };

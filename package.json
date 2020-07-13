@@ -1,14 +1,14 @@
 {
-  "_from": "mongoose-audit-trail",
-  "_id": "mongoose-audit-trail",
+  "_from": "mongoose-audit-track",
+  "_id": "mongoose-audit-track",
   "_inBundle": false,
   "_phantomChildren": {},
   "_requested": {
     "type": "tag",
     "registry": true,
-    "raw": "mongoose-audit-trail",
-    "name": "mongoose-audit-trail",
-    "escapedName": "mongoose-audit-trail",
+    "raw": "mongoose-audit-track",
+    "name": "mongoose-audit-track",
+    "escapedName": "mongoose-audit-track",
     "rawSpec": "",
     "saveSpec": null,
     "fetchSpec": "latest"
@@ -17,9 +17,9 @@
     "#USER",
     "/"
   ],
-  "_spec": "mongoose-audit-trail",
+  "_spec": "mongoose-audit-track",
   "bugs": {
-    "url": "https://github.com/MAkhamis/mongoose-audit-trail"
+    "url": "https://github.com/vigneshc91/mongoose-audit-trail"
   },
   "bundleDependencies": false,
   "contributors": [
@@ -50,7 +50,7 @@
   "engines": {
     "node": "*"
   },
-  "homepage": "https://github.com/MAkhamis/mongoose-audit-trail#readme",
+  "homepage": "https://github.com/vigneshc91/mongoose-audit-trail",
   "keywords": [
     "mongoose",
     "audit",
@@ -61,13 +61,13 @@
   ],
   "license": "GPL-2.0",
   "main": "index.js",
-  "name": "mongoose-audit-trail",
+  "name": "mongoose-audit-track",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MAkhamis/mongoose-audit-trail.git"
+    "url": "git+https://github.com/vigneshc91/mongoose-audit-trail"
   },
   "scripts": {
     "test": "istanbul cover --report lcov  _mocha tests --recursive"
   },
-  "version": "2.0.7"
+  "version": "1.0.0"
 }
