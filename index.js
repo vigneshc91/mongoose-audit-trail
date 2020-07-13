@@ -3,6 +3,7 @@ const pick = require("lodash.pick");
 const mongoose = require("mongoose");
 const { assign } = require("power-assign");
 const empty = require("deep-empty-object");
+const httpContext = require('express-http-context');
 
 // try to find an id property, otherwise just use the index in the array
 const objectHash = (obj, idx) => obj._id || obj.id || `$$index: ${idx}`;
@@ -21,7 +22,7 @@ function checkRequired(opts, queryObject, updatedObject) {
     return;
   }
   const { __user: user, __reason: reason } =
-    (queryObject && queryObject.options) || updatedObject || opts;
+    (queryObject && queryObject.options) || updatedObject || httpContext.get('user');
   if (
     opts.required &&
     ((opts.required.includes("user") && !user) ||
@@ -40,7 +41,7 @@ function saveDiffObject(
   method
 ) {
   const { __user: user, __reason: reason, __session: session } =
-    (queryObject && queryObject.options) || currentObject || opts;
+    (queryObject && queryObject.options) || currentObject || httpContext.get('user');
 
   let diff = diffPatcher.diff(
     JSON.parse(JSON.stringify(original)),

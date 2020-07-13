@@ -30,6 +30,7 @@
   ],
   "dependencies": {
     "deep-empty-object": "^1.0.5",
+    "express-http-context": "^1.2.4",
     "jsondiffpatch": "^0.1.38",
     "lodash.pick": "^4.4.0",
     "omit-deep": "git://github.com/izigibran/omit-deep.git#0.4.0",
