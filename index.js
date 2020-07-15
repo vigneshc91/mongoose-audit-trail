@@ -323,4 +323,5 @@ module.exports = {
   getVersion,
   getDiffs,
   getHistories,
+  History,
 };
