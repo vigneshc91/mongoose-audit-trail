@@ -69,9 +69,8 @@ function saveDiffObject(
     return;
   }
 
-  const collectionId = currentObject._id;
-  const collectionName =
-    currentObject.constructor.modelName || queryObject.model.modelName;
+  const collectionId = currentObject._id || updated._id;
+  const collectionName = currentObject.constructor.modelName || currentObject.modelName  || queryObject.model.modelName;
 
   return History.findOne({ collectionId, collectionName })
     .sort("-version")
@@ -306,6 +305,17 @@ const plugin = function lastModifiedPlugin(schema, opts = {}) {
     saveDiffs(this, opts, "update")
       .then(() => next())
       .catch(next);
+  });
+
+  schema.post("insertMany", function (doc, next) {
+    if (checkRequired(opts, this)) {
+      return next();
+    }
+    return doc.map(element => {
+        return saveDiffObject(this, {}, element.toObject(), opts, null, 'create')
+          .then(() => next())
+          .catch(next);
+    });
   });
 
   schema.pre("remove", function (next) {
