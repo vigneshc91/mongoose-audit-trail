@@ -92,6 +92,14 @@ const saveDiffHistory = (queryObject, currentObject, opts, method) => {
     var set = queryObject._update['$set'];
     queryObject._update = { ...queryObject._update, ...set };
     delete queryObject._update['$set'];
+    if (queryObject._update['$pull']) {
+        queryObject._update = { ...queryObject._update, ...queryObject._update['$pull'] };
+        delete queryObject._update['$pull'];
+    }
+    if (queryObject._update['$pullAll']) {
+        queryObject._update = { ...queryObject._update, ...queryObject._update['$pullAll'] };
+        delete queryObject._update['$pullAll'];
+    }
     const dbObject = pick(currentObject, Object.keys(updateParams));
     return saveDiffObject(currentObject, dbObject, assign(dbObject, queryObject._update), opts, queryObject, method);
 };
